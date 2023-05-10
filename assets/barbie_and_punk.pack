@@ -1,0 +1,61 @@
+
+barbie_and_punk.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+walk
+  rotate: false
+  xy: 1, 261
+  size: 960, 63
+  orig: 960, 63
+  offset: 0, 0
+  index: -1
+kick
+  rotate: false
+  xy: 1, 196
+  size: 480, 63
+  orig: 480, 63
+  offset: 0, 0
+  index: -1
+punk_hurt
+  rotate: false
+  xy: 1, 131
+  size: 384, 63
+  orig: 384, 63
+  offset: 0, 0
+  index: -1
+punk_idle
+  rotate: false
+  xy: 483, 196
+  size: 384, 63
+  orig: 384, 63
+  offset: 0, 0
+  index: -1
+punk_walk
+  rotate: false
+  xy: 1, 66
+  size: 384, 63
+  orig: 384, 63
+  offset: 0, 0
+  index: -1
+punch
+  rotate: false
+  xy: 387, 131
+  size: 288, 63
+  orig: 288, 63
+  offset: 0, 0
+  index: -1
+punk_punch
+  rotate: false
+  xy: 1, 1
+  size: 288, 63
+  orig: 288, 63
+  offset: 0, 0
+  index: -1
+hurt
+  rotate: false
+  xy: 387, 66
+  size: 192, 63
+  orig: 192, 63
+  offset: 0, 0
+  index: -1
