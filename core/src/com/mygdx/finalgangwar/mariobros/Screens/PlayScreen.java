@@ -63,7 +63,7 @@ public class PlayScreen implements Screen{
 
 
     public PlayScreen(MarioBros game){
-        atlas = new TextureAtlas("Mario_and_Enemies.pack");
+        atlas = new TextureAtlas("barbie_and_punk.pack");
 
         this.game = game;
         //create cam used to follow mario through cam world
@@ -97,8 +97,8 @@ public class PlayScreen implements Screen{
 
         music = MarioBros.manager.get("audio/music/mario_music.ogg", Music.class);
         music.setLooping(true);
-        music.setVolume(0.3f);
-        //music.play();
+        music.setVolume(1.0f);
+        music.play();
 
         items = new Array<Item>();
         itemsToSpawn = new LinkedBlockingQueue<ItemDef>();

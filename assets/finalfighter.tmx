@@ -115,7 +115,7 @@
   </object>
   <object id="26" x="1314.5" y="120" width="25" height="35.5">
    <properties>
-    <property name="frango" value=""/>
+    <property name="name" value="deixa"/>
    </properties>
    <ellipse/>
   </object>
@@ -149,7 +149,11 @@
   </object>
  </objectgroup>
  <objectgroup id="20" name="punk">
-  <object id="37" x="327.333" y="151.333"/>
+  <object id="37" x="327.333" y="151.333">
+   <properties>
+    <property name="name" value="start"/>
+   </properties>
+  </object>
   <object id="38" x="232" y="122"/>
   <object id="40" x="585.333" y="124"/>
   <object id="41" x="756" y="180"/>
