@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.finalgangwar.gangwar.map.WordBounds;
 
 public class Barbie {
-    private static final float SPEED = 5f; // Velocidade de movimento da Barbie
+    private static final float SPEED = 1f; // Velocidade de movimento da Barbie
 
     private Sprite sprite;
     private Animation<TextureRegion> walkAnimation;
@@ -37,8 +37,9 @@ public class Barbie {
 
         Array<TextureRegion> frames = new Array<>();
 
-        frames.addAll(atlas.findRegions("walk"));
-        walkAnimation = new Animation<>(0.1f, frames, Animation.PlayMode.LOOP);
+        for(int i = 1; i < 11; i++)
+            frames.add(new TextureRegion(atlas.findRegion("walk"), i * 16, 16, 64, 64));
+        walkAnimation = new Animation<>(0.1f, frames, Animation.PlayMode.LOOP_PINGPONG);
 
         frames.clear();
 
