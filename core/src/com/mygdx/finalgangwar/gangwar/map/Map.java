@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.finalgangwar.gangwar.characters.Barbie;
 
@@ -39,7 +40,6 @@ public class Map extends ApplicationAdapter {
 
         batch = new SpriteBatch();
 
-        barbie = new Barbie();
 
         // Carregando o mapa TiledMap
         TmxMapLoader mapLoader = new TmxMapLoader();
@@ -51,7 +51,9 @@ public class Map extends ApplicationAdapter {
         int numTilesVertical = (int) tiledMap.getProperties().get("height");
         float mapWidthInPixels = tileWidth * numTilesHorizontal;
         float mapHeightInPixels = tileHeight * numTilesVertical;
-        WordBounds.setWorldBounds(mapWidthInPixels, mapHeightInPixels);
+        worldBounds = new Rectangle(0, 0, mapWidthInPixels, mapHeightInPixels);
+
+        barbie = new Barbie(worldBounds);
 
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
     }
@@ -63,6 +65,16 @@ public class Map extends ApplicationAdapter {
 
         // Atualizar a posição da câmera para seguir a personagem
         camera.position.set(barbie.getPositionX(), barbie.getPositionY(), 0);
+        camera.update();
+
+        // Verificar os limites do mundo para a câmera
+        float cameraHalfWidth = camera.viewportWidth * 0.5f;
+        float cameraHalfHeight = camera.viewportHeight * 0.5f;
+
+        float cameraX = MathUtils.clamp(camera.position.x, cameraHalfWidth, worldBounds.width - cameraHalfWidth);
+        float cameraY = MathUtils.clamp(camera.position.y, cameraHalfHeight, worldBounds.height - cameraHalfHeight);
+
+        camera.position.set(cameraX, cameraY, 0);
         camera.update();
 
         // Renderização do mapa

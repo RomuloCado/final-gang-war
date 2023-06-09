@@ -6,13 +6,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
-import com.mygdx.finalgangwar.gangwar.map.WordBounds;
+import com.badlogic.gdx.math.Rectangle;
+
 
 public class Barbie {
-    private static final float SPEED = 1f; // Velocidade de movimento da Barbie
+    private static final float SPEED = 0.7f; // Velocidade de movimento da Barbie
+
+    private static final int FRAME_COLS = 10, FRAME_ROWS = 1;
+    private static final int FRAME_COLS_PUNCH = 3, FRAME_ROWS_PUNCH = 1;
+    private static final int FRAME_COLS_KICK = 5, FRAME_ROWS_KICK = 1;
+    private static final int FRAME_COLS_HURT = 2, FRAME_ROWS_HURT = 1;
 
     private Sprite sprite;
     private Animation<TextureRegion> walkAnimation;
@@ -20,6 +24,12 @@ public class Barbie {
     private Animation<TextureRegion> hurtAnimation;
     private Animation<TextureRegion> punchAnimation;
     private float stateTime;
+    Texture walkSheet;
+    Texture kickSheet;
+    Texture punchSheet;
+    Texture hurtSheet;
+
+    SpriteBatch spriteBatch;
 
     private int life;
     private boolean isPunching;
@@ -28,37 +38,81 @@ public class Barbie {
     private float velocityX;
     private float velocityY;
 
-    public Barbie() {
+    private Rectangle mapBounds;
+
+    public Barbie(Rectangle mapBounds) {
+        this.mapBounds = mapBounds;
+        walkSheet = new Texture(Gdx.files.internal("walk.png"));
+        kickSheet = new Texture(Gdx.files.internal("kick.png"));
+        punchSheet = new Texture(Gdx.files.internal("punch.png"));
+        hurtSheet = new Texture(Gdx.files.internal("hurt.png"));
+
         sprite = new Sprite(new Texture("barbie_and_punk.png")); // Textura da Barbie
+
         sprite.setPosition(100, 100); // Posição inicial da Barbie
 
-        // Carregar animações da Barbie a partir de um arquivo .pack
-        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("barbie_and_punk.pack"));
+        TextureRegion[][] tmp = TextureRegion.split(walkSheet,
+                walkSheet.getWidth() / FRAME_COLS,
+                walkSheet.getHeight() / FRAME_ROWS);
 
-        Array<TextureRegion> frames = new Array<>();
+        TextureRegion[] walkFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+        int index = 0;
+        for (int i = 0; i < FRAME_ROWS; i++) {
+            for (int j = 0; j < FRAME_COLS; j++) {
+                walkFrames[index++] = tmp[i][j];
+            }
+        }
 
-        for(int i = 1; i < 11; i++)
-            frames.add(new TextureRegion(atlas.findRegion("walk"), i * 16, 16, 64, 64));
-        walkAnimation = new Animation<>(0.1f, frames, Animation.PlayMode.LOOP_PINGPONG);
+        walkAnimation = new Animation<>(0.1f, walkFrames);
+        walkAnimation.setPlayMode(Animation.PlayMode.LOOP);
 
-        frames.clear();
+        TextureRegion[][] tmpKick = TextureRegion.split(kickSheet,
+                kickSheet.getWidth() / FRAME_COLS_KICK,
+                kickSheet.getHeight() / FRAME_ROWS_KICK);
 
-        frames.addAll(atlas.findRegions("kick"));
-        kickAnimation = new Animation<>(0.1f, frames, Animation.PlayMode.NORMAL);
+        TextureRegion[] kikFrames = new TextureRegion[FRAME_COLS_KICK * FRAME_ROWS_KICK];
+        int indexKick = 0;
+        for (int i = 0; i < FRAME_ROWS_KICK; i++) {
+            for (int j = 0; j < FRAME_COLS_KICK; j++) {
+                kikFrames[indexKick++] = tmpKick[i][j];
+            }
+        }
 
-        frames.clear();
+        kickAnimation = new Animation<>(0.1f, kikFrames);
+        kickAnimation.setPlayMode(Animation.PlayMode.NORMAL);
 
-        frames.addAll(atlas.findRegions("hurt"));
-        hurtAnimation = new Animation<>(0.1f, frames, Animation.PlayMode.NORMAL);
+        TextureRegion[][] tmpPunch = TextureRegion.split(punchSheet,
+                punchSheet.getWidth() / FRAME_COLS_PUNCH,
+                punchSheet.getHeight() / FRAME_ROWS_PUNCH);
 
-        frames.clear();
+        TextureRegion[] punchFrames = new TextureRegion[FRAME_COLS_PUNCH * FRAME_ROWS_PUNCH];
+        int indexPunch = 0;
+        for (int i = 0; i < FRAME_ROWS_PUNCH; i++) {
+            for (int j = 0; j < FRAME_COLS_PUNCH; j++) {
+                punchFrames[indexPunch++] = tmpPunch[i][j];
+            }
+        }
 
-        frames.addAll(atlas.findRegions("punch"));
-        punchAnimation = new Animation<>(0.1f, frames, Animation.PlayMode.NORMAL);
+        punchAnimation = new Animation<>(0.1f, punchFrames);
+        punchAnimation.setPlayMode(Animation.PlayMode.NORMAL);
 
-        frames.clear();
+        TextureRegion[][] tmpHurt = TextureRegion.split(hurtSheet,
+                hurtSheet.getWidth() / FRAME_COLS_HURT,
+                hurtSheet.getHeight() / FRAME_ROWS_HURT);
 
-        stateTime = 0;
+        TextureRegion[] hurtFrames = new TextureRegion[FRAME_COLS_HURT * FRAME_ROWS_HURT];
+        int indexHurt = 0;
+        for (int i = 0; i < FRAME_ROWS_HURT; i++) {
+            for (int j = 0; j < FRAME_COLS_HURT; j++) {
+                hurtFrames[indexHurt++] = tmpHurt[i][j];
+            }
+        }
+
+        hurtAnimation = new Animation<>(0.1f, hurtFrames);
+        hurtAnimation.setPlayMode(Animation.PlayMode.NORMAL);
+
+        spriteBatch = new SpriteBatch();
+        stateTime = 0f;
 
         life = 100;
         isPunching = false;
@@ -74,9 +128,37 @@ public class Barbie {
         // Atualizar a animação da Barbie
         stateTime += Gdx.graphics.getDeltaTime();
 
-        // Atualizar a posição da Barbie com base na velocidade de movimento
-        sprite.setX(sprite.getX() + velocityX);
-        sprite.setY(sprite.getY() + velocityY);
+        // Calcula a próxima posição da Barbie com base na velocidade de movimento
+        float nextX = sprite.getX() + velocityX;
+        float nextY = sprite.getY() + velocityY;
+
+        // Verifica se a próxima posição está dentro dos limites do mapa na dimensão X
+        if (nextX >= mapBounds.x && nextX <= mapBounds.x + mapBounds.width) {
+            sprite.setX(nextX);
+        } else {
+            // A próxima posição está fora dos limites do mapa na dimensão X, portanto, não atualizamos a posição X
+            velocityX = 0;
+        }
+
+        // Verifica se a próxima posição está dentro dos limites do mapa na dimensão Y
+        if (nextY >= mapBounds.y && nextY <= mapBounds.y + mapBounds.height) {
+            sprite.setY(nextY);
+        }
+
+        // Verifica se a próxima posição está dentro dos limites do mapa na dimensão Y superior (limite de cima)
+        if (nextY >= mapBounds.y && nextY + sprite.getHeight() <= mapBounds.y + mapBounds.height) {
+            sprite.setY(nextY);
+        }
+
+        if (isPunching && punchAnimation.isAnimationFinished(stateTime)) {
+            isPunching = false;
+            stateTime = 0f;
+        }
+
+        if (isKicking && kickAnimation.isAnimationFinished(stateTime)) {
+            isKicking = false;
+            stateTime = 0f;
+        }
     }
 
     public void render(SpriteBatch batch) {
@@ -92,29 +174,26 @@ public class Barbie {
         velocityX = 0;
         velocityY = 0;
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             velocityX = -SPEED;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             velocityX = SPEED;
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
             velocityY = SPEED;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             velocityY = -SPEED;
         }
 
-        // Atualizar a posição da Barbie com base na velocidade de movimento
-        float newX = sprite.getX() + velocityX;
-        float newY = sprite.getY() + velocityY;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            punch();
+        }
 
-        // Verificar se a nova posição está dentro dos limites do mundo
-        if (newX >= WordBounds.getWorldBounds().x && newX <= WordBounds.getWorldBounds().x + WordBounds.getWorldBounds().width - sprite.getWidth()) {
-            sprite.setX(newX);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            kick();
         }
-        if (newY >= WordBounds.getWorldBounds().y && newY <= WordBounds.getWorldBounds().y + WordBounds.getWorldBounds().height - sprite.getHeight()) {
-            sprite.setY(newY);
-        }
+
     }
 
     private TextureRegion getCurrentFrame() {
@@ -127,7 +206,8 @@ public class Barbie {
         } else if (velocityX != 0 || velocityY != 0) {
             return walkAnimation.getKeyFrame(stateTime);
         } else {
-            return walkAnimation.getKeyFrame(0); // Standing animation
+            stateTime = 0f;
+            return walkAnimation.getKeyFrame(0);
         }
     }
 
@@ -136,7 +216,7 @@ public class Barbie {
         // Lógica para executar a animação de soco
 
         // Reiniciar o tempo da animação
-        stateTime = 0;
+        stateTime = 0f;
     }
 
     private void kick() {
@@ -144,7 +224,7 @@ public class Barbie {
         // Lógica para executar a animação de chute
 
         // Reiniciar o tempo da animação
-        stateTime = 0;
+        stateTime = 0f;
     }
 
     public float getPositionX() {
@@ -154,6 +234,7 @@ public class Barbie {
     public float getPositionY() {
         return sprite.getY();
     }
+
 
     // Outros métodos, como getters/setters para atributos, lógica de colisões, etc.
 }
