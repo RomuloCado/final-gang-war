@@ -34,3 +34,5 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias
 
 ---
 
+Desenvolvido por Rômulo Cadó Dorneles.
+
