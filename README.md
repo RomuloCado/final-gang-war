@@ -8,9 +8,9 @@
 
 ## 🔖&nbsp; Sobre
 O jogo final gang war foi desenvolvido durante disciplina de desenvolvimento de jogos na graduação de Ciência da Computação, é um jogo estilo beat 'em up,
-desenvolvido com a platafor unity com a linguagem de programação c#. 
+desenvolvido com a plataforma unity com a linguagem de programação c#. 
 Para mais informações do jogo o repositório está com o artigo em pdf detalhando todas as fases de desenvolvimento do jogo e seus desafios,
-no arquivo pdf Fases de Desenvolvimento do Jogo Final Gang War - Rômulo Cadó Dorneles Versão Final.
+no arquivo [PDF]([https://github.com/pedrindenard/2d-game-unity/blob/main/Desenvolvimento%20de%20jogo%202D%20com%20C%23%20e%20Unity.pdf](https://github.com/RomuloCado/final-gang-war/blob/main/Fases%20de%20Desenvolvimento%20do%20Jogo%20Final%20Gang%20War%20-%20R%C3%B4mulo%20Cad%C3%B3%20Dorneles%20Vers%C3%A3o%20Final.pdf).
 
 ---
 
